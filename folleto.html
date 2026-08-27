@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Continuación Voluntaria</title>
+    <!-- Font Awesome para el icono de descarga -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Librería para convertir HTML a PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -146,11 +150,38 @@
             text-align: center;
             margin-top: 10px;
         }
+
+        /* Estilos del botón flotante de descarga */
+        .btn-descargar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #691C32; /* Color guinda institucional */
+            color: white;
+            border: 2px solid #B38E5D; /* Borde dorado institucional */
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-descargar:hover {
+            background-color: #4C0A1B; /* Guinda oscuro al pasar el ratón */
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
 
-    <div class="page">
+    <!-- Contenedor que se convertirá en PDF -->
+    <div class="page" id="folleto-contenido">
         <!-- Left Column -->
         <div class="column left-col">
             <h1>CONTINUACION<br>VOLUNTARIA</h1>
@@ -252,5 +283,28 @@
         </div>
     </div>
 
+    <!-- Botón Flotante de Descarga -->
+    <button class="btn-descargar" onclick="descargarPDF()">
+        <i class="fa-solid fa-file-arrow-down"></i> Descargar
+    </button>
+
+    <script>
+        function descargarPDF() {
+            // Selecciona el elemento que contiene el folleto completo
+            const elemento = document.getElementById('folleto-contenido');
+            
+            // Configuración de cómo se generará el PDF
+            const opciones = {
+                margin:       0,
+                filename:     'Folleto_Continuacion_Voluntaria.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true }, // useCORS permite descargar imágenes externas
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+
+            // Generar y guardar el PDF
+            html2pdf().set(opciones).from(elemento).save();
+        }
+    </script>
 </body>
 </html>
