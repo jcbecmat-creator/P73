@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Trámites y Pensiones - Gobierno de México</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gob-guinda: #691C32;
+            --gob-guinda-dark: #4C0A1B;
+            --gob-dorado: #B38E5D;
+            --gob-alerta-bg: #FCF8E3;
+            --gob-alerta-border: #FBEED5;
+        }
+
+        .bg-gob-guinda { background-color: var(--gob-guinda); }
+        .text-gob-guinda { color: var(--gob-guinda); }
+        .border-gob-guinda { border-color: var(--gob-guinda); }
+        .hover\:bg-gob-guinda-dark:hover { background-color: var(--gob-guinda-dark); }
+        
+        .border-gob-dorado { border-color: var(--gob-dorado); }
+        .text-gob-dorado { color: var(--gob-dorado); }
+
+        /* Integración para eliminar el recuadro visible del logotipo */
+        .logo-blend {
+            mix-blend-mode: lighten;
+        }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header institucional gob.mx -->
+    <header class="bg-gob-guinda text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center text-sm">
+            <div class="flex items-center gap-3">
+                <!-- Imagen principal con fusión de fondo -->
+                <img id="main-logo" 
+                     src="https://i.ibb.co/1Gy93y2X/Captura-de-pantalla-2026-08-27-104222.png" 
+                     alt="Gobierno de México" 
+                     class="h-9 object-contain logo-blend"
+                     onerror="this.style.display='none'; document.getElementById('logo-text-fallback').classList.remove('hidden');">
+                
+                <!-- Resguardo tipográfico si la imagen externa falla -->
+                <div id="logo-text-fallback" class="hidden flex items-center gap-2 font-bold tracking-wide text-white text-base">
+                    <i class="fa-solid fa-landmark text-amber-400"></i>
+                    <span>Gobierno de México</span>
+                </div>
+            </div>
+            
+            <nav class="flex items-center gap-6">
+                <!-- Estado de Sesión en Header -->
+                <div id="user-header-info" class="hidden flex items-center gap-3 text-xs bg-black/20 px-3 py-1.5 rounded-full">
+                    <span><i class="fa-solid fa-user-circle text-amber-300 mr-1"></i> <span id="user-display-name">Usuario</span></span>
+                    <button onclick="cerrarSesion()" class="text-amber-200 hover:text-white underline ml-2">Cerrar sesión</button>
+                </div>
+                <a href="#" class="hover:underline hidden sm:inline text-xs">Trámites</a>
+                <a href="#" class="hover:underline hidden sm:inline text-xs">Gobierno</a>
+                <button class="hover:opacity-80"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PANTALLA 1: INICIO DE SESIÓN -->
+    <section id="view-login" class="flex-grow flex items-center justify-center py-12 px-4">
+        <div class="max-w-md w-full bg-white rounded-lg border border-gray-200 shadow-xl overflow-hidden">
+            <div class="bg-gob-guinda p-6 text-white text-center">
+                <i class="fa-solid fa-id-card text-4xl text-amber-400 mb-2"></i>
+                <h2 class="text-xl font-bold">Portal Único de Trámites</h2>
+                <p class="text-xs text-amber-100 mt-1">Inicia sesión para ingresar al Simulador de Pensiones Ley '73</p>
+            </div>
+            
+            <form id="login-form" onsubmit="iniciarSesion(event)" class="p-6 space-y-4">
+                <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 p-3 rounded text-xs">
+                    Por favor, ingresa tu usuario y contraseña.
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">CURP / Usuario / Correo Electrónico <span class="text-red-600">*</span></label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" id="input-usuario" placeholder="Ej. ABCD900101HDFXXX01" class="w-full pl-9 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-gob-guinda focus:outline-none" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Contraseña <span class="text-red-600">*</span></label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2.5 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="input-password" placeholder="••••••••" class="w-full pl-9 p-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-gob-guinda focus:outline-none" required>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between text-xs">
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                        <input type="checkbox" class="rounded text-gob-guinda focus:ring-gob-guinda">
+                        Recordar mi usuario
+                    </label>
+                    <a href="#" class="text-gob-guinda font-semibold hover:underline">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-gob-guinda text-white font-bold rounded shadow hover:bg-gob-guinda-dark transition duration-200 text-sm flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+                </button>
+
+                <div class="text-center pt-3 border-t border-gray-100">
+                    <span class="text-xs text-gray-500">¿No tienes una cuenta registrada? </span>
+                    <a href="#" class="text-xs text-gob-guinda font-bold hover:underline">Regístrate aquí</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- PANTALLA 2: SIMULADOR DE PENSIÓN (Se activa al iniciar sesión) -->
+    <main id="view-simulator" class="hidden max-w-6xl mx-auto px-4 py-6 w-full flex-grow">
+        <div class="text-xs text-gray-500 flex items-center gap-2 mb-4">
+            <a href="#" class="hover:text-gray-700"><i class="fa-solid fa-house"></i></a>
+            <span>&rsaquo;</span>
+            <a href="#" class="hover:text-gray-700">Servicio Digital</a>
+            <span>&rsaquo;</span>
+            <span class="font-semibold text-gray-700">Simula tu Pensión de Edad</span>
+        </div>
+
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Simula tu Pensión de Edad</h1>
+        <div class="w-16 h-1 bg-gob-dorado mb-6"></div>
+
+        <!-- Aviso de validez -->
+        <div class="bg-[var(--gob-alerta-bg)] border border-[var(--gob-alerta-border)] p-5 rounded text-sm text-gray-800 mb-8 leading-relaxed">
+            <p class="font-bold mb-3 text-gray-900">
+                Estás utilizando un simulador para conocer el importe aproximado de tu pensión, con base en los datos que proporciones. El resultado que arrojará no es vinculatorio al trámite de solicitud de pensión, ni tiene validez alguna.
+            </p>
+            <p class="mb-2">Para el ejercicio de simulación necesitas:</p>
+            <ul class="list-disc pl-6 space-y-1 mb-3">
+                <li>Año en el que iniciaste tu cotización a la Ley del Seguro Social.</li>
+                <li>Años cumplidos y Semanas Cotizadas bajo la Ley '73.</li>
+                <li>El promedio de tus salarios base de cotización de los últimos cinco años.</li>
+            </ul>
+        </div>
+
+        <!-- Formulario e Inputs de Cálculo -->
+        <form id="pension-form" class="space-y-6 bg-white p-2">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-gray-200 pb-6">
+                <!-- Columna Izquierda -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-gray-800 text-base border-b pb-2">Datos Principales de Cotización</h3>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            No. Semanas Cotizadas <span class="text-red-600">*</span>
+                        </label>
+                        <input type="number" id="semanas" value="1882" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Salario Diario Promedio (últimas 250 Semanas) <span class="text-red-600">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input type="number" step="0.01" id="sdp" value="1537.00" class="w-full pl-7 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Edad de Jubilación (años cumplidos) <span class="text-red-600">*</span>
+                        </label>
+                        <input type="number" id="edad" value="60" min="60" max="65" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Salario Mínimo DF / UMA de Referencia
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-gray-500">$</span>
+                            <input type="number" step="0.01" id="salario_minimo" value="80.04" class="w-full pl-7 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-gray-800 text-base border-b pb-2">Asignaciones Familiares / Cargas</h3>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">¿Tiene Esposa o Concubina?</label>
+                        <select id="esposa" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm">
+                            <option value="si" selected>Sí</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Hijos Menores o Estudiando (capturar Número)</label>
+                        <input type="number" id="hijos" value="0" min="0" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Padres (sólo a falta de viuda y huérfanos)</label>
+                        <input type="number" id="padres" value="0" min="0" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones e Interfaz gob.mx -->
+            <div class="flex flex-col md:flex-row justify-between items-end gap-4 pt-2">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Capture los caracteres de la imagen <span class="text-red-600">*</span>:</label>
+                    <div class="flex items-center gap-2">
+                        <div id="captcha-box" class="bg-amber-400 text-white font-mono text-xl font-bold tracking-widest py-1.5 px-4 rounded select-none shadow-inner" style="background-color: #e3a008;">
+                            5fY8e
+                        </div>
+                        <button type="button" onclick="generarCaptcha()" class="p-2 text-gray-600 hover:text-gray-900 border border-gray-300 rounded">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                        </button>
+                        <input type="text" id="captcha-input" value="5fY8e" placeholder="Capture" class="p-2 border border-gray-300 rounded w-28 text-sm outline-none focus:border-gob-guinda">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 w-full md:w-auto justify-end">
+                    <button type="button" onclick="limpiarFormulario()" class="px-6 py-2 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-100 font-medium transition">
+                        Limpiar
+                    </button>
+                    <button type="submit" class="px-6 py-2 border-2 border-gob-guinda text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
+                        Calcular
+                    </button>
+                    <button type="button" onclick="cerrarSesion()" class="px-6 py-2 border border-gob-dorado text-gob-dorado rounded text-sm hover:bg-amber-50 font-medium transition">
+                        Salir
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Resultados -->
+        <div id="seccion-resultados" class="mt-10 border-t-2 border-gray-200 pt-6">
+            <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wide mb-4">
+                PENSIONES DE VEJEZ Y CESANTIA EN EDAD AVANZADA LEY '73
+            </h2>
+
+            <div class="bg-gray-50 border border-gray-200 p-3 rounded mb-6 flex justify-between items-center max-w-xl">
+                <span class="text-sm font-semibold text-gray-700">Salario Diario Promedio en veces salario mínimo (VSM):</span>
+                <span id="res-vsm" class="font-mono font-bold text-base text-gray-900">19.20289855</span>
+            </div>
+
+            <div class="overflow-x-auto border border-gray-200 rounded">
+                <table class="w-full text-left border-collapse text-xs md:text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700 border-b border-gray-300">
+                            <th class="p-3 font-bold">Concepto</th>
+                            <th class="p-3 font-bold text-right">Anual ($)</th>
+                            <th class="p-3 font-bold text-right">Mes ($)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body" class="divide-y divide-gray-200">
+                        <!-- JS fill -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer institucional gob.mx -->
+    <footer class="bg-gob-guinda text-white mt-12 text-xs">
+        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <img src="https://i.ibb.co/1Gy93y2X/Captura-de-pantalla-2026-08-27-104222.png" 
+                     alt="Gobierno de México" 
+                     class="h-10 object-contain mb-4 logo-blend"
+                     onerror="this.style.display='none'; document.getElementById('footer-logo-fallback').classList.remove('hidden');">
+                <div id="footer-logo-fallback" class="hidden font-bold text-white text-base mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-landmark text-amber-400"></i> Gobierno de México
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3">Enlaces</h4>
+                <ul class="space-y-1 text-gray-200">
+                    <li><a href="#" class="hover:underline">Datos abiertos de la SABG</a></li>
+                    <li><a href="#" class="hover:underline">Marco Jurídico</a></li>
+                    <li><a href="#" class="hover:underline">Plataforma Nacional de Transparencia</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-3">¿Qué es gob.mx?</h4>
+                <p class="text-gray-200 leading-relaxed mb-3">
+                    Es el portal único de trámites, información y participación ciudadana.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Lógica de Autenticación Simulada
+        function iniciarSesion(e) {
+            e.preventDefault();
+            const usuario = document.getElementById('input-usuario').value.trim();
+            const pass = document.getElementById('input-password').value.trim();
+
+            if (!usuario || !pass) {
+                document.getElementById('login-error').classList.remove('hidden');
+                return;
+            }
+
+            // Simulación exitosa de Login
+            document.getElementById('user-display-name').innerText = usuario;
+            document.getElementById('user-header-info').classList.remove('hidden');
+            
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-simulator').classList.remove('hidden');
+
+            calcularValores();
+        }
+
+        function cerrarSesion() {
+            document.getElementById('user-header-info').classList.add('hidden');
+            document.getElementById('view-simulator').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+            document.getElementById('input-password').value = '';
+        }
+
+        // Lógica de Cálculo de Pensión Ley '73
+        const fmtNumber = new Intl.NumberFormat('es-MX', {
+            minimumFractionDigits: 4,
+            maximumFractionDigits: 5
+        });
+
+        const fmtVSM = new Intl.NumberFormat('es-MX', {
+            minimumFractionDigits: 8,
+            maximumFractionDigits: 8
+        });
+
+        function generarCaptcha() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+            let captcha = '';
+            for (let i = 0; i < 5; i++) {
+                captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('captcha-box').innerText = captcha;
+            document.getElementById('captcha-input').value = captcha;
+        }
+
+        function calcularValores() {
+            const semanas = parseInt(document.getElementById('semanas').value) || 0;
+            const sdp = parseFloat(document.getElementById('sdp').value) || 0;
+            const edad = parseInt(document.getElementById('edad').value) || 60;
+            const tieneEsposa = document.getElementById('esposa').value === 'si';
+            const numHijos = parseInt(document.getElementById('hijos').value) || 0;
+            const numPadres = parseInt(document.getElementById('padres').value) || 0;
+            const salarioMinimo = parseFloat(document.getElementById('salario_minimo').value) || 80.04;
+
+            const vsm = sdp / salarioMinimo;
+            const pctBasica = 0.13;
+            const pctIncremento = 0.0245;
+
+            const semanasExtra = Math.max(0, semanas - 500);
+            let anosInc = Math.floor(semanasExtra / 52);
+            const residuo = semanasExtra % 52;
+            if (residuo >= 27) anosInc += 1;
+            else if (residuo >= 13) anosInc += 0.5;
+
+            const cuantiaBasicaAnual = pctBasica * sdp * 365;
+            const incrementoAnual = anosInc * pctIncremento * sdp * 365;
+            const cuantiaAnualPension = cuantiaBasicaAnual + incrementoAnual;
+
+            const ayudaEsposa = tieneEsposa ? cuantiaAnualPension * 0.15 : 0;
+            const ayudaHijos = cuantiaAnualPension * 0.10 * numHijos;
+            const ayudaPadres = (!tieneEsposa && numHijos === 0 && numPadres > 0) ? cuantiaAnualPension * 0.10 * numPadres : 0;
+            const ayudaSoledad = (!tieneEsposa && numHijos === 0 && numPadres === 0) ? cuantiaAnualPension * 0.15 : 0;
+
+            const cuantiaMasAyudas = cuantiaAnualPension + ayudaEsposa + ayudaHijos + ayudaPadres + ayudaSoledad;
+            const pensionVejezAnual = cuantiaMasAyudas * 1.11;
+
+            const factoresEdad = { 60: 0.75, 61: 0.80, 62: 0.85, 63: 0.90, 64: 0.95, 65: 1.00 };
+            const factorCesantia = factoresEdad[edad] || (edad >= 65 ? 1.00 : 0.75);
+            const pensionCesantiaAnual = pensionVejezAnual * factorCesantia;
+
+            document.getElementById('res-vsm').innerText = fmtVSM.format(vsm);
+
+            const conceptos = [
+                { titulo: '(=) Cuantía Básica Anual', anual: cuantiaBasicaAnual },
+                { titulo: '(=) Incremento Anual a la Cuantía Básica', anual: incrementoAnual },
+                { titulo: '(=) Cuantía Anual de la Pensión', anual: cuantiaAnualPension, destacada: true },
+                { titulo: '(=) Ayuda Anual Asignación Esposa', anual: ayudaEsposa },
+                { titulo: '(=) Ayuda Anual Hijos Menores o Estudiando', anual: ayudaHijos },
+                { titulo: '(=) Ayuda Anual Padres', anual: ayudaPadres },
+                { titulo: '(=) Ayuda Anual x Soledad', anual: ayudaSoledad },
+                { titulo: '(=) Cuantía Anual de la Pensión + Ayudas', anual: cuantiaMasAyudas, destacada: true, bg: 'bg-gray-100' },
+                { titulo: '(=) Pensión Anual x Vejez', anual: pensionVejezAnual, destacada: true, bg: 'bg-amber-50', textCol: 'text-amber-900' },
+                { titulo: '(=) Pensión Anual x Cesantía en Edad Avanzada', anual: pensionCesantiaAnual, destacada: true, bg: 'bg-red-50', textCol: 'text-red-950' }
+            ];
+
+            const tbody = document.getElementById('tabla-body');
+            tbody.innerHTML = '';
+
+            conceptos.forEach(c => {
+                const tr = document.createElement('tr');
+                if (c.bg) tr.className = c.bg;
+                if (c.textCol) tr.classList.add(c.textCol);
+
+                const fontClass = c.destacada ? 'font-bold' : '';
+                
+                tr.innerHTML = `
+                    <td class="p-3 ${fontClass}">${c.titulo}</td>
+                    <td class="p-3 text-right font-mono ${fontClass}">${fmtNumber.format(c.anual)}</td>
+                    <td class="p-3 text-right font-mono ${fontClass}">${fmtNumber.format(c.anual / 12)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('semanas').value = '';
+            document.getElementById('sdp').value = '';
+            document.getElementById('hijos').value = '0';
+            document.getElementById('padres').value = '0';
+            document.getElementById('edad').value = '60';
+            document.getElementById('esposa').value = 'si';
+            calcularValores();
+        }
+
+        document.getElementById('pension-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calcularValores();
+        });
+    </script>
+</body>
+</html>
