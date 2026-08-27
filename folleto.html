@@ -94,9 +94,9 @@
 
         /* Ajuste para que el texto se alinee a la izquierda y no se monte en la flecha */
         .list-item {
-            display: block; /* Cambiado de flex a block */
+            display: block;
             margin-bottom: 8px;
-            padding-left: 18px; /* Espacio para la flecha */
+            padding-left: 18px;
             position: relative;
             text-align: left;
         }
@@ -189,7 +189,8 @@
             <p style="text-align: center; font-weight: bold;">Dirigido a:</p>
             
             <div style="display: flex; align-items: center;">
-                 <img src="https://i.ibb.co/nqRgj9ZD/M40.png" alt="Oficina" class="img-oficina">
+                 <!-- Se añadió crossorigin="anonymous" -->
+                 <img src="https://i.ibb.co/nqRgj9ZD/M40.png" alt="Oficina" class="img-oficina" crossorigin="anonymous">
                  <p style="width: 52%;">Aquellas personas que actualmente no se encuentran vigentes en el Régimen Obligatorio y que su Baja no sea mayor a 5 años.</p>
             </div>
 
@@ -198,8 +199,8 @@
             <div class="list-item">Invalidez y Vida</div>
             <div class="list-item">Retiro, Cesantía en Edad Avanzada y Vejez.</div>
 
-            <!-- URL de ImgBB restaurada -->
-            <img src="https://i.ibb.co/13QkgSx/P2.png" alt="Pareja de ancianos" class="img-anciano">
+            <!-- Se añadió crossorigin="anonymous" AQUÍ TAMBIÉN -->
+            <img src="https://i.ibb.co/13QkgSx/P2.png" alt="Pareja de ancianos" class="img-anciano" crossorigin="anonymous">
             
             <p class="left-disclaimer">
                 &#8226; ESTA MODALIDAD NO OTORGA EL DERECHO A SERVICIO MEDICO, pero si tiene la opción de contratar el Seguro para la Familia de manera independiente.
@@ -220,7 +221,8 @@
             <div class="list-item">CURP</div>
 
             <div style="display: flex; align-items: center; margin-top: 15px;">
-                 <img src="https://i.ibb.co/4wpp4B0L/MD.png" alt="Manos con dinero" class="img-manos">
+                 <!-- Se añadió crossorigin="anonymous" -->
+                 <img src="https://i.ibb.co/4wpp4B0L/MD.png" alt="Manos con dinero" class="img-manos" crossorigin="anonymous">
                  <div>
                      <h3 style="margin: 0;">SUJETOS QUE AMPARA:</h3>
                      <h2 style="margin: 5px 0 0 0; text-align: center;">Solo al Asegurado</h2>
@@ -299,7 +301,8 @@
                 margin:       0,
                 filename:     'Folleto_Continuacion_Voluntaria.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // useCORS permite descargar imágenes externas de ImgBB
+                // useCORS: true es vital, junto con el atributo HTML crossorigin="anonymous"
+                html2canvas:  { scale: 2, useCORS: true, allowTaint: false },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
             };
 
