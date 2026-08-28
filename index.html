@@ -500,9 +500,9 @@
             `;
 
             document.getElementById('registro-contenido').innerHTML = html;
-            document.getElementById('registro-overlay').classList.remove('hidden');
-            // Forzar al overlay a iniciar en la parte superior
-            document.getElementById('registro-overlay').scrollTop = 0;
+            const overlay = document.getElementById('registro-overlay');
+            overlay.classList.remove('hidden');
+            overlay.scrollTop = 0; // Forzar al overlay a iniciar en la parte superior
         }
 
         function cerrarRegistro() {
@@ -511,26 +511,25 @@
 
         function descargarRegistroPDF() {
             const elemento = document.getElementById('registro-contenido');
+            const overlay = document.getElementById('registro-overlay');
             
-            // Crear un clon temporal fuera del scroll para evitar que se recorra el PDF
-            const clone = elemento.cloneNode(true);
-            clone.style.position = 'absolute';
-            clone.style.top = '0';
-            clone.style.left = '-9999px';
-            clone.style.opacity = '0';
-            document.body.appendChild(clone);
+            // Guardar scroll actual y fijar arriba para evitar desfase en el renderizado
+            const originalScroll = overlay.scrollTop;
+            overlay.scrollTop = 0;
+            overlay.style.overflow = 'hidden'; // Prevenir movimiento mientras renderiza
 
             const opciones = {
                 margin:       0,
                 filename:     'Registro_Pension.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 1056 },
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, scrollX: 0 },
                 jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
             };
             
-            // Generar y luego eliminar el clon
-            html2pdf().set(opciones).from(clone).save().then(() => {
-                document.body.removeChild(clone);
+            html2pdf().set(opciones).from(elemento).save().then(() => {
+                // Restaurar el scroll y el overflow
+                overlay.style.overflow = 'auto';
+                overlay.scrollTop = originalScroll;
             });
         }
 
