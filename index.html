@@ -6,6 +6,8 @@
     <title>Portal Trámites y Pensiones - Gobierno de México</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Librería para descargar el registro en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --gob-guinda: #691C32;
@@ -23,7 +25,6 @@
         .border-gob-dorado { border-color: var(--gob-dorado); }
         .text-gob-dorado { color: var(--gob-dorado); }
 
-        /* Integración para eliminar el recuadro visible del logotipo */
         .logo-blend {
             mix-blend-mode: lighten;
         }
@@ -42,14 +43,12 @@
     <header class="bg-gob-guinda text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-2.5 flex justify-between items-center text-sm">
             <div class="flex items-center gap-3">
-                <!-- Imagen principal con fusión de fondo -->
                 <img id="main-logo" 
                      src="https://i.ibb.co/1Gy93y2X/Captura-de-pantalla-2026-08-27-104222.png" 
                      alt="Gobierno de México" 
                      class="h-9 object-contain logo-blend"
                      onerror="this.style.display='none'; document.getElementById('logo-text-fallback').classList.remove('hidden');">
                 
-                <!-- Resguardo tipográfico si la imagen externa falla -->
                 <div id="logo-text-fallback" class="hidden flex items-center gap-2 font-bold tracking-wide text-white text-base">
                     <i class="fa-solid fa-landmark text-amber-400"></i>
                     <span>Gobierno de México</span>
@@ -57,7 +56,6 @@
             </div>
             
             <nav class="flex items-center gap-6">
-                <!-- Estado de Sesión en Header -->
                 <div id="user-header-info" class="hidden flex items-center gap-3 text-xs bg-black/20 px-3 py-1.5 rounded-full">
                     <span><i class="fa-solid fa-user-circle text-amber-300 mr-1"></i> <span id="user-display-name">Usuario</span></span>
                     <button onclick="cerrarSesion()" class="text-amber-200 hover:text-white underline ml-2">Cerrar sesión</button>
@@ -119,7 +117,7 @@
         </div>
     </section>
 
-    <!-- PANTALLA 2: SIMULADOR DE PENSIÓN (Se activa al iniciar sesión) -->
+    <!-- PANTALLA 2: SIMULADOR DE PENSIÓN -->
     <main id="view-simulator" class="hidden max-w-6xl mx-auto px-4 py-6 w-full flex-grow">
         <div class="text-xs text-gray-500 flex items-center gap-2 mb-4">
             <a href="#" class="hover:text-gray-700"><i class="fa-solid fa-house"></i></a>
@@ -145,11 +143,10 @@
             </ul>
         </div>
 
-        <!-- Formulario e Inputs de Cálculo -->
+        <!-- Formulario e Inputs -->
         <form id="pension-form" class="space-y-6 bg-white p-2">
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-gray-200 pb-6">
-                <!-- Columna Izquierda -->
                 <div class="space-y-4">
                     <h3 class="font-bold text-gray-800 text-base border-b pb-2">Datos Principales de Cotización</h3>
                     
@@ -157,7 +154,6 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-1">
                             No. Semanas Cotizadas <span class="text-red-600">*</span>
                         </label>
-                        <!-- MODIFICADO: Value en 0 -->
                         <input type="number" id="semanas" value="0" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm" required>
                     </div>
 
@@ -167,7 +163,6 @@
                         </label>
                         <div class="relative">
                             <span class="absolute left-3 top-2 text-gray-500">$</span>
-                            <!-- MODIFICADO: Value en 0.00 -->
                             <input type="number" step="0.01" id="sdp" value="0.00" class="w-full pl-7 p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm" required>
                         </div>
                     </div>
@@ -190,14 +185,12 @@
                     </div>
                 </div>
 
-                <!-- Columna Derecha -->
                 <div class="space-y-4">
                     <h3 class="font-bold text-gray-800 text-base border-b pb-2">Asignaciones Familiares / Cargas</h3>
 
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">¿Tiene Esposa o Concubina?</label>
                         <select id="esposa" class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-gob-guinda outline-none text-sm">
-                            <!-- MODIFICADO: Selected en "No" -->
                             <option value="si">Sí</option>
                             <option value="no" selected>No</option>
                         </select>
@@ -215,7 +208,7 @@
                 </div>
             </div>
 
-            <!-- Botones e Interfaz gob.mx -->
+            <!-- Botones -->
             <div class="flex flex-col md:flex-row justify-between items-end gap-4 pt-2">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 mb-1">Capture los caracteres de la imagen <span class="text-red-600">*</span>:</label>
@@ -234,7 +227,8 @@
                     <button type="button" onclick="limpiarFormulario()" class="px-6 py-2 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-100 font-medium transition">
                         Limpiar
                     </button>
-                    <button type="submit" class="px-6 py-2 border-2 border-gob-guinda text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
+                    <!-- CORREGIDO: Type button para evitar recargo y pérdida de texto -->
+                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
                         Calcular
                     </button>
                     <button type="button" onclick="cerrarSesion()" class="px-6 py-2 border border-gob-dorado text-gob-dorado rounded text-sm hover:bg-amber-50 font-medium transition">
@@ -252,7 +246,8 @@
 
             <div class="bg-gray-50 border border-gray-200 p-3 rounded mb-6 flex justify-between items-center max-w-xl">
                 <span class="text-sm font-semibold text-gray-700">Salario Diario Promedio en veces salario mínimo (VSM):</span>
-                <span id="res-vsm" class="font-mono font-bold text-base text-gray-900">0.00000000</span>
+                <!-- DECIMALES CORREGIDOS A 2 -->
+                <span id="res-vsm" class="font-mono font-bold text-base text-gray-900">0.00</span>
             </div>
 
             <div class="overflow-x-auto border border-gray-200 rounded">
@@ -272,7 +267,7 @@
         </div>
     </main>
 
-    <!-- Footer institucional gob.mx -->
+    <!-- Footer -->
     <footer class="bg-gob-guinda text-white mt-12 text-xs">
         <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
@@ -301,11 +296,34 @@
         </div>
     </footer>
 
-    <!-- BOTÓN FLOTANTE PARA FOLLETO UMA (VUELTO A INTEGRAR) -->
-    <a href="folleto.html" target="_blank" class="fixed bottom-6 right-6 z-50 bg-gob-guinda text-white px-5 py-3 rounded-full shadow-xl flex items-center gap-3 hover:bg-gob-guinda-dark transition-all duration-300 border-2 border-gob-dorado group">
+    <!-- BOTÓN FLOTANTE IZQUIERDO: REGISTRO -->
+    <button onclick="abrirRegistro()" class="fixed bottom-6 left-6 z-50 bg-gob-guinda text-white px-5 py-3 rounded-full shadow-xl flex items-center gap-3 hover:bg-gob-guinda-dark transition-all duration-300 border-2 border-gob-dorado">
+        <i class="fa-solid fa-file-lines text-amber-400 text-xl"></i>
+        <span class="font-bold text-sm hidden md:inline">Registro</span>
+    </button>
+
+    <!-- BOTÓN FLOTANTE DERECHO: FOLLETO UMA -->
+    <a href="folleto.html" target="_blank" class="fixed bottom-6 right-6 z-50 bg-gob-guinda text-white px-5 py-3 rounded-full shadow-xl flex items-center gap-3 hover:bg-gob-guinda-dark transition-all duration-300 border-2 border-gob-dorado">
         <i class="fa-solid fa-file-pdf text-amber-400 text-xl"></i>
         <span class="font-bold text-sm hidden md:inline">Folleto UMA</span>
     </a>
+
+    <!-- OVERLAY PARA REGISTRO PDF (Hoja Carta Horizontal) -->
+    <div id="registro-overlay" class="hidden fixed inset-0 bg-black/70 z-[60] overflow-auto p-4">
+        <div class="mx-auto bg-white shadow-2xl my-4" style="width: 1056px; min-height: 816px;">
+            <div id="registro-contenido" style="padding: 40px; box-sizing: border-box;">
+                <!-- El contenido se inyecta por JS -->
+            </div>
+        </div>
+        <div class="sticky bottom-4 w-full flex justify-center gap-4 py-4">
+            <button onclick="descargarRegistroPDF()" class="bg-gob-guinda text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-2 border-2 border-gob-dorado hover:bg-gob-guinda-dark transition">
+                <i class="fa-solid fa-file-arrow-down"></i> Descargar PDF
+            </button>
+            <button onclick="cerrarRegistro()" class="bg-gray-600 text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-2 hover:bg-gray-700 transition">
+                <i class="fa-solid fa-times"></i> Cerrar
+            </button>
+        </div>
+    </div>
 
     <script>
         // Lógica de Autenticación Simulada
@@ -319,7 +337,6 @@
                 return;
             }
 
-            // Simulación exitosa de Login
             document.getElementById('user-display-name').innerText = usuario;
             document.getElementById('user-header-info').classList.remove('hidden');
             
@@ -336,15 +353,15 @@
             document.getElementById('input-password').value = '';
         }
 
-        // Lógica de Cálculo de Pensión Ley '73
+        // DECIMALES CORREGIDOS A 2
         const fmtNumber = new Intl.NumberFormat('es-MX', {
-            minimumFractionDigits: 4,
-            maximumFractionDigits: 5
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
 
         const fmtVSM = new Intl.NumberFormat('es-MX', {
-            minimumFractionDigits: 8,
-            maximumFractionDigits: 8
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         });
 
         function generarCaptcha() {
@@ -427,7 +444,6 @@
         }
 
         function limpiarFormulario() {
-            // MODIFICADO: Limpiar con los nuevos valores predeterminados
             document.getElementById('semanas').value = '0';
             document.getElementById('sdp').value = '0.00';
             document.getElementById('hijos').value = '0';
@@ -437,6 +453,79 @@
             calcularValores();
         }
 
+        // LÓGICA DE REGISTRO PDF
+        function abrirRegistro() {
+            const semanas = document.getElementById('semanas').value || '0';
+            const sdp = document.getElementById('sdp').value || '0.00';
+            const edad = document.getElementById('edad').value || '0';
+            const esposa = document.getElementById('esposa').value === 'si' ? 'Sí' : 'No';
+            const hijos = document.getElementById('hijos').value || '0';
+            const padres = document.getElementById('padres').value || '0';
+            const vsm = document.getElementById('res-vsm').innerText;
+            const salarioMinimo = document.getElementById('salario_minimo').value || '0.00';
+            
+            const tablaHTML = document.getElementById('tabla-body').innerHTML;
+
+            const html = `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 4px solid #691C32; padding-bottom: 15px;">
+                        <h1 style="color: #691C32; font-size: 24px; margin: 0; text-transform: uppercase;">Registro de Simulación de Pensión</h1>
+                        <p style="color: #B38E5D; font-size: 14px; margin-top: 5px;">Ley del Seguro Social 1973</p>
+                    </div>
+
+                    <div style="display: flex; gap: 40px; margin-bottom: 30px;">
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 8px; font-size: 16px;">Datos Principales de Cotización</h3>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>No. Semanas Cotizadas:</strong> ${semanas}</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>Salario Diario Promedio:</strong> $${sdp}</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>Edad de Jubilación:</strong> ${edad} años</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>Salario Mínimo/UMA:</strong> $${salarioMinimo}</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>VSM:</strong> ${vsm}</p>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 8px; font-size: 16px;">Asignaciones Familiares</h3>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>¿Tiene Esposa o Concubina?:</strong> ${esposa}</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>Hijos Menores:</strong> ${hijos}</p>
+                            <p style="font-size: 13px; margin: 8px 0;"><strong>Padres:</strong> ${padres}</p>
+                        </div>
+                    </div>
+
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                        <thead>
+                            <tr style="background-color: #691C32; color: white;">
+                                <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Concepto</th>
+                                <th style="border: 1px solid #ddd; padding: 10px; text-align: right;">Anual ($)</th>
+                                <th style="border: 1px solid #ddd; padding: 10px; text-align: right;">Mes ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tablaHTML}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            document.getElementById('registro-contenido').innerHTML = html;
+            document.getElementById('registro-overlay').classList.remove('hidden');
+        }
+
+        function cerrarRegistro() {
+            document.getElementById('registro-overlay').classList.add('hidden');
+        }
+
+        function descargarRegistroPDF() {
+            const elemento = document.getElementById('registro-contenido');
+            const opciones = {
+                margin:       0,
+                filename:     'Registro_Simulacion_Pension.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+            };
+            html2pdf().set(opciones).from(elemento).save();
+        }
+
+        // Prevenir envío accidental del formulario si se presiona Enter
         document.getElementById('pension-form').addEventListener('submit', function(e) {
             e.preventDefault();
             calcularValores();
