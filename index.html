@@ -227,8 +227,8 @@
                     <button type="button" onclick="limpiarFormulario()" class="px-6 py-2 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-100 font-medium transition">
                         Limpiar
                     </button>
-                    <!-- CORREGIDO: Fondo tenue con clase estándar de Tailwind para que el texto no desaparezca -->
-                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda bg-rose-50 text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
+                    <!-- CORREGIDO: Fondo tenue, al pasar el mouse o dar clic se vuelve blanco y el texto se queda guinda -->
+                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda bg-rose-50 text-gob-guinda font-semibold rounded text-sm hover:bg-white focus:bg-white active:bg-white transition">
                         Calcular
                     </button>
                     <button type="button" onclick="cerrarSesion()" class="px-6 py-2 border border-gob-dorado text-gob-dorado rounded text-sm hover:bg-amber-50 font-medium transition">
@@ -501,6 +501,8 @@
 
             document.getElementById('registro-contenido').innerHTML = html;
             document.getElementById('registro-overlay').classList.remove('hidden');
+            // Forzar al overlay a iniciar en la parte superior
+            document.getElementById('registro-overlay').scrollTop = 0;
         }
 
         function cerrarRegistro() {
@@ -509,14 +511,27 @@
 
         function descargarRegistroPDF() {
             const elemento = document.getElementById('registro-contenido');
+            
+            // Crear un clon temporal fuera del scroll para evitar que se recorra el PDF
+            const clone = elemento.cloneNode(true);
+            clone.style.position = 'absolute';
+            clone.style.top = '0';
+            clone.style.left = '-9999px';
+            clone.style.opacity = '0';
+            document.body.appendChild(clone);
+
             const opciones = {
                 margin:       0,
                 filename:     'Registro_Pension.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true }, // Configuración estándar y estable
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' } // Formato en pulgadas, nativo y sin errores
+                html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 1056 },
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
             };
-            html2pdf().set(opciones).from(elemento).save();
+            
+            // Generar y luego eliminar el clon
+            html2pdf().set(opciones).from(clone).save().then(() => {
+                document.body.removeChild(clone);
+            });
         }
 
         document.getElementById('pension-form').addEventListener('submit', function(e) {
