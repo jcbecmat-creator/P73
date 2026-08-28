@@ -227,8 +227,8 @@
                     <button type="button" onclick="limpiarFormulario()" class="px-6 py-2 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-100 font-medium transition">
                         Limpiar
                     </button>
-                    <!-- CORREGIDO: Fondo tenue para que el texto no desaparezca -->
-                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda bg-[#f7e8ec] text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
+                    <!-- CORREGIDO: Fondo tenue con clase estándar de Tailwind para que el texto no desaparezca -->
+                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda bg-rose-50 text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
                         Calcular
                     </button>
                     <button type="button" onclick="cerrarSesion()" class="px-6 py-2 border border-gob-dorado text-gob-dorado rounded text-sm hover:bg-amber-50 font-medium transition">
@@ -307,9 +307,8 @@
         <span class="font-bold text-sm hidden md:inline">Folleto UMA</span>
     </a>
 
-    <!-- OVERLAY PARA REGISTRO PDF (Hoja Carta Horizontal estricta) -->
+    <!-- OVERLAY PARA REGISTRO PDF -->
     <div id="registro-overlay" class="hidden fixed inset-0 bg-black/70 z-[60] overflow-auto p-4 flex flex-col items-center">
-        <!-- Contenedor ajustado a 1056x816px con overflow oculto para forzar 1 sola página -->
         <div id="registro-contenido" style="width: 1056px; height: 816px; padding: 30px; box-sizing: border-box; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden;">
             <!-- El contenido se inyecta por JS -->
         </div>
@@ -324,7 +323,6 @@
     </div>
 
     <script>
-        // Lógica de Autenticación Simulada
         function iniciarSesion(e) {
             e.preventDefault();
             const usuario = document.getElementById('input-usuario').value.trim();
@@ -450,7 +448,6 @@
             calcularValores();
         }
 
-        // LÓGICA DE REGISTRO PDF
         function abrirRegistro() {
             const semanas = document.getElementById('semanas').value || '0';
             const sdp = document.getElementById('sdp').value || '0.00';
@@ -463,7 +460,6 @@
             
             const tablaHTML = document.getElementById('tabla-body').innerHTML;
 
-            // Reducidos los padding y tamaños de fuente para que quepa en una sola hoja
             const html = `
                 <div style="font-family: Arial, sans-serif; color: #333; height: 100%; display: flex; flex-direction: column;">
                     <div style="text-align: center; margin-bottom: 15px; border-bottom: 4px solid #691C32; padding-bottom: 10px;">
@@ -517,8 +513,8 @@
                 margin:       0,
                 filename:     'Registro_Pension.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true, width: 1056, height: 816 }, // Fuerza las dimensiones exactas de carta horizontal
-                jsPDF:        { unit: 'px', format: [1056, 816], orientation: 'landscape', compress: true }
+                html2canvas:  { scale: 2, useCORS: true }, // Configuración estándar y estable
+                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' } // Formato en pulgadas, nativo y sin errores
             };
             html2pdf().set(opciones).from(elemento).save();
         }
