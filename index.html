@@ -227,8 +227,8 @@
                     <button type="button" onclick="limpiarFormulario()" class="px-6 py-2 border border-gray-400 text-gray-700 rounded text-sm hover:bg-gray-100 font-medium transition">
                         Limpiar
                     </button>
-                    <!-- CORREGIDO: Type button para evitar recargo y pérdida de texto -->
-                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
+                    <!-- CORREGIDO: Fondo tenue para que el texto no desaparezca -->
+                    <button type="button" onclick="calcularValores()" class="px-6 py-2 border-2 border-gob-guinda bg-[#f7e8ec] text-gob-guinda font-semibold rounded text-sm hover:bg-gob-guinda hover:text-white transition">
                         Calcular
                     </button>
                     <button type="button" onclick="cerrarSesion()" class="px-6 py-2 border border-gob-dorado text-gob-dorado rounded text-sm hover:bg-amber-50 font-medium transition">
@@ -246,7 +246,6 @@
 
             <div class="bg-gray-50 border border-gray-200 p-3 rounded mb-6 flex justify-between items-center max-w-xl">
                 <span class="text-sm font-semibold text-gray-700">Salario Diario Promedio en veces salario mínimo (VSM):</span>
-                <!-- DECIMALES CORREGIDOS A 2 -->
                 <span id="res-vsm" class="font-mono font-bold text-base text-gray-900">0.00</span>
             </div>
 
@@ -308,14 +307,13 @@
         <span class="font-bold text-sm hidden md:inline">Folleto UMA</span>
     </a>
 
-    <!-- OVERLAY PARA REGISTRO PDF (Hoja Carta Horizontal) -->
-    <div id="registro-overlay" class="hidden fixed inset-0 bg-black/70 z-[60] overflow-auto p-4">
-        <div class="mx-auto bg-white shadow-2xl my-4" style="width: 1056px; min-height: 816px;">
-            <div id="registro-contenido" style="padding: 40px; box-sizing: border-box;">
-                <!-- El contenido se inyecta por JS -->
-            </div>
+    <!-- OVERLAY PARA REGISTRO PDF (Hoja Carta Horizontal estricta) -->
+    <div id="registro-overlay" class="hidden fixed inset-0 bg-black/70 z-[60] overflow-auto p-4 flex flex-col items-center">
+        <!-- Contenedor ajustado a 1056x816px con overflow oculto para forzar 1 sola página -->
+        <div id="registro-contenido" style="width: 1056px; height: 816px; padding: 30px; box-sizing: border-box; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden;">
+            <!-- El contenido se inyecta por JS -->
         </div>
-        <div class="sticky bottom-4 w-full flex justify-center gap-4 py-4">
+        <div class="sticky bottom-0 w-full flex justify-center gap-4 py-4 mt-4">
             <button onclick="descargarRegistroPDF()" class="bg-gob-guinda text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-2 border-2 border-gob-dorado hover:bg-gob-guinda-dark transition">
                 <i class="fa-solid fa-file-arrow-down"></i> Descargar PDF
             </button>
@@ -353,7 +351,6 @@
             document.getElementById('input-password').value = '';
         }
 
-        // DECIMALES CORREGIDOS A 2
         const fmtNumber = new Intl.NumberFormat('es-MX', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
@@ -466,36 +463,37 @@
             
             const tablaHTML = document.getElementById('tabla-body').innerHTML;
 
+            // Reducidos los padding y tamaños de fuente para que quepa en una sola hoja
             const html = `
-                <div style="font-family: Arial, sans-serif; color: #333;">
-                    <div style="text-align: center; margin-bottom: 30px; border-bottom: 4px solid #691C32; padding-bottom: 15px;">
-                        <h1 style="color: #691C32; font-size: 24px; margin: 0; text-transform: uppercase;">Registro de Simulación de Pensión</h1>
-                        <p style="color: #B38E5D; font-size: 14px; margin-top: 5px;">Ley del Seguro Social 1973</p>
+                <div style="font-family: Arial, sans-serif; color: #333; height: 100%; display: flex; flex-direction: column;">
+                    <div style="text-align: center; margin-bottom: 15px; border-bottom: 4px solid #691C32; padding-bottom: 10px;">
+                        <h1 style="color: #691C32; font-size: 22px; margin: 0; text-transform: uppercase;">REGISTRO DE PENSIÓN</h1>
+                        <p style="color: #B38E5D; font-size: 12px; margin-top: 4px;">Ley del Seguro Social 1973</p>
                     </div>
 
-                    <div style="display: flex; gap: 40px; margin-bottom: 30px;">
-                        <div style="flex: 1; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 8px; font-size: 16px;">Datos Principales de Cotización</h3>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>No. Semanas Cotizadas:</strong> ${semanas}</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>Salario Diario Promedio:</strong> $${sdp}</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>Edad de Jubilación:</strong> ${edad} años</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>Salario Mínimo/UMA:</strong> $${salarioMinimo}</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>VSM:</strong> ${vsm}</p>
+                    <div style="display: flex; gap: 20px; margin-bottom: 15px;">
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
+                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 5px; font-size: 13px;">Datos Principales de Cotización</h3>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>No. Semanas Cotizadas:</strong> ${semanas}</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>Salario Diario Promedio:</strong> $${sdp}</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>Edad de Jubilación:</strong> ${edad} años</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>Salario Mínimo/UMA:</strong> $${salarioMinimo}</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>VSM:</strong> ${vsm}</p>
                         </div>
-                        <div style="flex: 1; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
-                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 8px; font-size: 16px;">Asignaciones Familiares</h3>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>¿Tiene Esposa o Concubina?:</strong> ${esposa}</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>Hijos Menores:</strong> ${hijos}</p>
-                            <p style="font-size: 13px; margin: 8px 0;"><strong>Padres:</strong> ${padres}</p>
+                        <div style="flex: 1; border: 1px solid #ccc; padding: 10px; border-radius: 6px;">
+                            <h3 style="margin-top: 0; color: #691C32; border-bottom: 2px solid #B38E5D; padding-bottom: 5px; font-size: 13px;">Asignaciones Familiares</h3>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>¿Tiene Esposa o Concubina?:</strong> ${esposa}</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>Hijos Menores:</strong> ${hijos}</p>
+                            <p style="font-size: 11px; margin: 4px 0;"><strong>Padres:</strong> ${padres}</p>
                         </div>
                     </div>
 
-                    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 10px; flex-grow: 1;">
                         <thead>
                             <tr style="background-color: #691C32; color: white;">
-                                <th style="border: 1px solid #ddd; padding: 10px; text-align: left;">Concepto</th>
-                                <th style="border: 1px solid #ddd; padding: 10px; text-align: right;">Anual ($)</th>
-                                <th style="border: 1px solid #ddd; padding: 10px; text-align: right;">Mes ($)</th>
+                                <th style="border: 1px solid #ddd; padding: 6px; text-align: left;">Concepto</th>
+                                <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">Anual ($)</th>
+                                <th style="border: 1px solid #ddd; padding: 6px; text-align: right;">Mes ($)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -517,15 +515,14 @@
             const elemento = document.getElementById('registro-contenido');
             const opciones = {
                 margin:       0,
-                filename:     'Registro_Simulacion_Pension.pdf',
+                filename:     'Registro_Pension.pdf',
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+                html2canvas:  { scale: 2, useCORS: true, width: 1056, height: 816 }, // Fuerza las dimensiones exactas de carta horizontal
+                jsPDF:        { unit: 'px', format: [1056, 816], orientation: 'landscape', compress: true }
             };
             html2pdf().set(opciones).from(elemento).save();
         }
 
-        // Prevenir envío accidental del formulario si se presiona Enter
         document.getElementById('pension-form').addEventListener('submit', function(e) {
             e.preventDefault();
             calcularValores();
